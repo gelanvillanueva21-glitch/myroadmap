@@ -256,6 +256,18 @@ const createCategoryCard = (category, categoryProgress, state, callbacks) => {
     card.append(header);
 
     if (expanded) {
+        const pathwayTrack = category.id === "frontend-engineering"
+            ? "frontend"
+            : category.id === "backend-engineering"
+                ? "backend"
+                : null;
+        if (pathwayTrack && !state.searchTerm.trim() && state.filter === "all") {
+            const pathwaySelector = createElement("div", "pathway-selector");
+            pathwaySelector.setAttribute("aria-label", `Choose ${pathwayTrack} learning paths`);
+            renderPathwaySelector(pathwaySelector, pathwayTrack, state, callbacks.onSelectionChange);
+            card.append(pathwaySelector);
+        }
+
         const topicsContainer = createElement("div", "category-topics");
         for (const group of category.groups ?? [{ title: null, topicIds: category.topics.map((topic) => topic.id) }]) {
             const groupTopics = category.topics
@@ -296,18 +308,6 @@ export const renderApp = (elements, state, progress, callbacks) => {
             : "All categories";
     elements.sectionEyebrow.textContent = searchActive ? "FILTERED ROADMAP" : selectedCategory ? "ROADMAP CATEGORY" : "ROADMAP OVERVIEW";
     elements.expandAllButton.textContent = categories.every((category) => state.expandedCategories.has(category.id)) ? "Collapse all" : "Expand all";
-    const pathwayTrack = selectedCategory?.id === "frontend-engineering"
-        ? "frontend"
-        : selectedCategory?.id === "backend-engineering"
-            ? "backend"
-            : null;
-    elements.pathwaySelector.hidden = !pathwayTrack || searchActive;
-    if (pathwayTrack && !searchActive) {
-        renderPathwaySelector(elements.pathwaySelector, pathwayTrack, state, callbacks.onSelectionChange);
-    } else {
-        elements.pathwaySelector.replaceChildren();
-    }
-
     elements.roadmapContent.replaceChildren();
     let visibleTopics = 0;
     categories.forEach((category) => {

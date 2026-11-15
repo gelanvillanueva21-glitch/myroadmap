@@ -35,8 +35,7 @@ const elements = {
     importFile: document.querySelector("#import-file"),
     resetButton: document.querySelector("#reset-button"),
     menuToggle: document.querySelector("#menu-toggle"),
-    sidebar: document.querySelector("#sidebar"),
-    pathwaySelector: document.querySelector("#pathway-selector")
+    sidebar: document.querySelector("#sidebar")
 };
 
 const knownTopicIds = new Set(allTopics.map((topic) => topic.id));
