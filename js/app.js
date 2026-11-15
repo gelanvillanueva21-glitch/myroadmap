@@ -1,4 +1,4 @@
-import { roadmap, allTopics } from "./roadmap.js";
+import { buildRoadmap, allTopics } from "./roadmap.js";
 import { calculateProgress } from "./progress.js";
 import {
     exportProgress,
@@ -35,13 +35,15 @@ const elements = {
     importFile: document.querySelector("#import-file"),
     resetButton: document.querySelector("#reset-button"),
     menuToggle: document.querySelector("#menu-toggle"),
-    sidebar: document.querySelector("#sidebar")
+    sidebar: document.querySelector("#sidebar"),
+    pathwaySelector: document.querySelector("#pathway-selector")
 };
 
 const knownTopicIds = new Set(allTopics.map((topic) => topic.id));
 const initialProgress = loadProgress(knownTopicIds);
 const state = {
-    roadmap,
+    selections: initialProgress.data.selections,
+    roadmap: buildRoadmap(initialProgress.data.selections),
     completedTopics: initialProgress.data.completedTopics,
     activeCategoryId: null,
     expandedCategories: new Set(),
@@ -65,7 +67,13 @@ const update = () => {
             }
             update();
         },
-        onToggleTopic: toggleTopic
+        onToggleTopic: toggleTopic,
+        onSelectionChange: (_track, selections) => {
+            state.selections = selections;
+            state.roadmap = buildRoadmap(state.selections);
+            persist();
+            update();
+        }
     });
 };
 
@@ -80,7 +88,7 @@ const showToast = (message) => {
 
 const persist = () => {
     try {
-        saveProgress(state.completedTopics);
+        saveProgress(state.completedTopics, state.selections);
         elements.storageAlert.hidden = true;
         return true;
     } catch (error) {
@@ -153,7 +161,7 @@ elements.expandAllButton.addEventListener("click", () => {
 });
 
 elements.exportButton.addEventListener("click", () => {
-    const backup = exportProgress(state.completedTopics);
+    const backup = exportProgress(state.completedTopics, state.selections);
     const blob = new Blob([`${JSON.stringify(backup, null, 2)}\n`], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -181,6 +189,12 @@ elements.importFile.addEventListener("change", async () => {
             return;
         }
         state.completedTopics = result.data.completedTopics;
+        state.selections = result.data.selections;
+        state.roadmap = buildRoadmap(state.selections);
+        state.searchTerm = "";
+        state.filter = "all";
+        elements.searchInput.value = "";
+        elements.filterSelect.value = "all";
         const saved = persist();
         update();
         if (saved) {

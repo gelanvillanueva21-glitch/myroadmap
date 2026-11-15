@@ -1,3 +1,5 @@
+import { PATHWAY_OPTIONS } from "./roadmap.js";
+
 const createElement = (tagName, className, text) => {
     const element = document.createElement(tagName);
     if (className) {
@@ -52,6 +54,122 @@ const renderDashboard = (elements, progress) => {
     elements.totalTopicsCaption.textContent = `of ${progress.total} topics`;
     elements.completedCategories.textContent = String(progress.completedCategories);
     elements.totalCategoriesCaption.textContent = `of ${progress.totalCategories} categories`;
+};
+
+const copySelections = (selections) => ({
+    frontend: {
+        languages: [...selections.frontend.languages],
+        frameworks: Object.fromEntries(Object.entries(selections.frontend.frameworks).map(([id, values]) => [id, [...values]]))
+    },
+    backend: {
+        languages: [...selections.backend.languages],
+        frameworks: Object.fromEntries(Object.entries(selections.backend.frameworks).map(([id, values]) => [id, [...values]]))
+    }
+});
+
+const renderPathwaySelector = (container, track, state, onSelectionChange) => {
+    const options = PATHWAY_OPTIONS[track];
+    const selection = state.selections[track];
+    container.replaceChildren();
+
+    const heading = createElement("div", "pathway-heading");
+    heading.append(
+        createElement("div", "eyebrow", "CUSTOMIZE YOUR ROADMAP"),
+        createElement("h3", "", `Choose ${track === "backend" ? "languages" : "frontend languages"} and frameworks`)
+    );
+    const helperText = createElement("p", "pathway-helper", track === "backend"
+        ? "Select one or more languages. Each selected language reveals its fundamentals and available frameworks."
+        : "HTML and CSS stay in your core path. Select JavaScript or TypeScript, then choose the frameworks you want to learn.");
+    container.append(heading, helperText);
+
+    const languageGrid = createElement("div", "pathway-language-grid");
+    options.languages.forEach((language) => {
+        const selected = selection.languages.includes(language.id);
+        const label = createElement("label", `pathway-option${selected ? " is-selected" : ""}`);
+        const checkbox = createElement("input", "pathway-checkbox");
+        checkbox.type = "checkbox";
+        checkbox.checked = selected;
+        checkbox.setAttribute("aria-label", `Learn ${language.title}`);
+        checkbox.addEventListener("change", () => {
+            const next = copySelections(state.selections);
+            if (checkbox.checked) {
+                next[track].languages.push(language.id);
+                next[track].frameworks[language.id] ??= [];
+            } else {
+                next[track].languages = next[track].languages.filter((id) => id !== language.id);
+                delete next[track].frameworks[language.id];
+            }
+            onSelectionChange(track, next);
+        });
+        const copy = createElement("span", "pathway-option-copy");
+        copy.append(
+            createElement("strong", "", language.title),
+            createElement("span", "", language.description)
+        );
+        label.append(checkbox, copy);
+        languageGrid.append(label);
+    });
+    container.append(languageGrid);
+
+    const selectedLanguages = options.languages.filter((language) => selection.languages.includes(language.id));
+    if (!selectedLanguages.length) {
+        container.append(createElement("p", "pathway-empty", "Choose at least one language to add its learning path."));
+        return;
+    }
+
+    selectedLanguages.forEach((language) => {
+        const frameworkOptions = track === "frontend"
+            ? options.frameworks
+            : options.frameworks[language.id] ?? [];
+        const section = createElement("section", "framework-section");
+        const sectionHeading = createElement("div", "framework-heading");
+        sectionHeading.append(
+            createElement("h4", "", `${language.title} frameworks`),
+            createElement("span", "", "Optional")
+        );
+        section.append(sectionHeading);
+
+        const frameworkGrid = createElement("div", "framework-grid");
+        frameworkOptions.forEach((framework) => {
+            const chosen = (selection.frameworks[language.id] ?? []).includes(framework.id);
+            const missingRequirements = (framework.requires ?? []).filter(
+                (requiredId) => !(selection.frameworks[language.id] ?? []).includes(requiredId)
+            );
+            const label = createElement("label", `framework-option${chosen ? " is-selected" : ""}${missingRequirements.length ? " is-disabled" : ""}`);
+            const checkbox = createElement("input", "pathway-checkbox");
+            checkbox.type = "checkbox";
+            checkbox.checked = chosen;
+            checkbox.disabled = missingRequirements.length > 0;
+            checkbox.setAttribute("aria-label", `Learn ${framework.title} with ${language.title}`);
+            const copy = createElement("span", "pathway-option-copy");
+            copy.append(
+                createElement("strong", "", framework.title),
+                createElement("span", "", missingRequirements.length
+                    ? `Select ${missingRequirements.map((id) => options.frameworks.find((item) => item.id === id)?.title ?? id).join(", ")} first.`
+                    : framework.description)
+            );
+            if (framework.url) {
+                const link = createElement("a", "pathway-docs", "Official docs ↗");
+                link.href = framework.url;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.addEventListener("click", (event) => event.stopPropagation());
+                copy.append(link);
+            }
+            checkbox.addEventListener("change", () => {
+                const next = copySelections(state.selections);
+                const current = next[track].frameworks[language.id] ?? [];
+                next[track].frameworks[language.id] = checkbox.checked
+                    ? [...current, framework.id]
+                    : current.filter((id) => id !== framework.id);
+                onSelectionChange(track, next);
+            });
+            label.append(checkbox, copy);
+            frameworkGrid.append(label);
+        });
+        section.append(frameworkGrid);
+        container.append(section);
+    });
 };
 
 const topicMatches = (topic, filter, completedTopics, searchTerm) => {
@@ -178,6 +296,17 @@ export const renderApp = (elements, state, progress, callbacks) => {
             : "All categories";
     elements.sectionEyebrow.textContent = searchActive ? "FILTERED ROADMAP" : selectedCategory ? "ROADMAP CATEGORY" : "ROADMAP OVERVIEW";
     elements.expandAllButton.textContent = categories.every((category) => state.expandedCategories.has(category.id)) ? "Collapse all" : "Expand all";
+    const pathwayTrack = selectedCategory?.id === "frontend-engineering"
+        ? "frontend"
+        : selectedCategory?.id === "backend-engineering"
+            ? "backend"
+            : null;
+    elements.pathwaySelector.hidden = !pathwayTrack || searchActive;
+    if (pathwayTrack && !searchActive) {
+        renderPathwaySelector(elements.pathwaySelector, pathwayTrack, state, callbacks.onSelectionChange);
+    } else {
+        elements.pathwaySelector.replaceChildren();
+    }
 
     elements.roadmapContent.replaceChildren();
     let visibleTopics = 0;

@@ -447,6 +447,138 @@ h2 {
     color: #d0c3ff;
 }
 
+.pathway-selector {
+    padding: 18px;
+    margin-bottom: 17px;
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    background: linear-gradient(120deg, #191820, #17171e 70%);
+}
+
+.pathway-heading .eyebrow {
+    margin-bottom: 5px;
+}
+
+.pathway-heading h3 {
+    margin-bottom: 0;
+    font-size: 15px;
+    font-weight: 620;
+    letter-spacing: -0.02em;
+}
+
+.pathway-helper,
+.pathway-empty {
+    margin: 6px 0 14px;
+    color: var(--color-muted);
+    font-size: 11px;
+}
+
+.pathway-language-grid,
+.framework-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+    gap: 8px;
+}
+
+.pathway-option,
+.framework-option {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px;
+    border: 1px solid var(--color-border);
+    border-radius: 7px;
+    background: rgb(17 17 22 / 55%);
+    cursor: pointer;
+    transition: border-color 120ms ease, background 120ms ease;
+}
+
+.pathway-option:hover,
+.framework-option:hover {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface-hover);
+}
+
+.pathway-option.is-selected,
+.framework-option.is-selected {
+    border-color: rgb(167 139 250 / 42%);
+    background: var(--color-accent-soft);
+}
+
+.pathway-checkbox {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+    margin: 2px 0 0;
+    accent-color: var(--color-accent-strong);
+    cursor: pointer;
+}
+
+.pathway-option-copy {
+    display: grid;
+    min-width: 0;
+    gap: 3px;
+}
+
+.pathway-option-copy strong {
+    color: var(--color-text);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.pathway-option-copy > span {
+    color: var(--color-muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.pathway-docs {
+    width: fit-content;
+    margin-top: 3px;
+    color: #b5a4f6;
+    font-size: 9px;
+    text-decoration: none;
+}
+
+.pathway-docs:hover {
+    color: #d0c3ff;
+    text-decoration: underline;
+}
+
+.framework-section {
+    padding-top: 14px;
+    margin-top: 15px;
+    border-top: 1px solid var(--color-border);
+}
+
+.framework-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 9px;
+}
+
+.framework-heading h4 {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.framework-heading > span {
+    color: var(--color-subtle);
+    font-size: 9px;
+}
+
+.framework-option.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.framework-option.is-disabled .pathway-checkbox {
+    cursor: not-allowed;
+}
+
 .toolbar {
     display: flex;
     gap: 9px;
@@ -939,6 +1071,15 @@ kbd {
 
     .workspace {
         padding-top: 29px;
+    }
+
+    .pathway-selector {
+        padding: 13px;
+    }
+
+    .pathway-language-grid,
+    .framework-grid {
+        grid-template-columns: 1fr;
     }
 
     .toolbar {

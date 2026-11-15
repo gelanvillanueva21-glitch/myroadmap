@@ -4,7 +4,8 @@ A static, responsive learning tracker for following a long-term full-stack softw
 
 ## Features
 
-- 12 roadmap categories with 300+ independently tracked topics.
+- 12 roadmap categories with selectable frontend and backend learning paths.
+- Choose multiple frontend/backend languages and optional frameworks; each selected language includes its fundamentals before framework topics.
 - Overall, category, completed-topic, remaining-topic, and completed-category statistics.
 - Search by topic title or description, plus completion and priority filters.
 - Collapsible categories and direct navigation.
@@ -49,9 +50,31 @@ Then open `http://localhost:8000`.
 
 ## Progress storage and backups
 
-Completion state is saved immediately under the `software-engineering-roadmap-progress` LocalStorage key in the current browser and on the current origin. It does not synchronize between devices or different browsers. Export creates a versioned JSON backup; Import validates the file and asks before replacing current progress. Keep exported backups somewhere safe if you want to move progress to another browser.
+Completion state and selected learning paths are saved immediately under the `software-engineering-roadmap-progress` LocalStorage key in the current browser and on the current origin. Version 2 backups include completed topic IDs and the selected frontend/backend languages and frameworks:
 
-If existing browser data is malformed or unsupported, it is left untouched and an on-page warning is shown. Unknown topic IDs in valid backups are ignored so a backup from a different roadmap revision remains usable.
+```json
+{
+  "version": 2,
+  "completedTopics": {
+    "backend-engineering-rust-ownership": true
+  },
+  "selections": {
+    "frontend": {
+      "languages": ["javascript"],
+      "frameworks": { "javascript": ["react"] }
+    },
+    "backend": {
+      "languages": ["rust"],
+      "frameworks": { "rust": ["axum"] }
+    }
+  },
+  "updatedAt": "2026-11-15T09:08:52.368Z"
+}
+```
+
+Version 1 progress files are still accepted and load with the default paths. Import validates the file and asks before replacing current progress and path selections. Keep exported backups somewhere safe if you want to move progress to another browser.
+
+If existing browser data is malformed or unsupported, it is left untouched and an on-page warning is shown. Unknown topic IDs or removed path options in valid backups are ignored so a backup from a different roadmap revision remains usable. Unchecking a language removes its topics from current progress totals; its saved topic completions are retained and become active again if that language is selected later.
 
 ## Publish with GitHub Pages
 
