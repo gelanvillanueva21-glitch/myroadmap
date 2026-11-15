@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111116">
+    <meta name="description" content="A personal, browser-based full-stack software engineering learning roadmap tracker.">
+    <title>Full-Stack Software Engineering Roadmap</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/styles.css">
+    <script type="module" src="js/app.js"></script>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar" aria-label="Roadmap navigation">
+            <a class="brand" href="./" aria-label="Full-Stack Roadmap home">
+                <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+                <span class="brand-copy">
+                    <strong>DevPath</strong>
+                    <span>Engineering roadmap</span>
+                </span>
+            </a>
+
+            <div class="sidebar-label">YOUR ROADMAP</div>
+            <nav id="category-navigation" class="category-navigation" aria-label="Roadmap categories"></nav>
+
+            <div class="sidebar-footer">
+                <div class="storage-note">
+                    <span class="storage-dot" aria-hidden="true"></span>
+                    <span>Saved in this browser</span>
+                </div>
+                <p>Your progress stays on this device. It does not sync across browsers.</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <button class="mobile-menu-button" id="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">
+                    <span class="sr-only">Toggle roadmap navigation</span>
+                    <span aria-hidden="true">☰</span>
+                </button>
+                <div class="breadcrumb"><span>Roadmap</span><span aria-hidden="true">/</span><strong id="breadcrumb-current">Overview</strong></div>
+                <div class="topbar-actions">
+                    <button class="button button-quiet" id="export-button" type="button">Export progress</button>
+                    <button class="button button-quiet" id="import-button" type="button">Import</button>
+                    <input id="import-file" class="sr-only" type="file" accept=".json,application/json" aria-label="Choose a progress backup file">
+                </div>
+            </header>
+
+            <div id="storage-alert" class="notice notice-warning" role="status" hidden></div>
+            <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+            <section class="page-heading" aria-labelledby="page-title">
+                <div>
+                    <div class="eyebrow">FULL-STACK SOFTWARE ENGINEERING</div>
+                    <h1 id="page-title">Your learning journey</h1>
+                    <p class="page-description">Build strong fundamentals, ship real software, and keep growing at your own pace.</p>
+                </div>
+                <button class="button button-danger-quiet" id="reset-button" type="button">Reset progress</button>
+            </section>
+
+            <section class="overview-grid" aria-label="Overall progress">
+                <article class="overview-card progress-card">
+                    <div class="card-heading">
+                        <div>
+                            <span class="metric-label">Overall progress</span>
+                            <div class="progress-number" id="overall-percentage">0%</div>
+                        </div>
+                        <span class="progress-icon" aria-hidden="true">↗</span>
+                    </div>
+                    <div class="progress-track progress-track-large" id="overall-progress-track" role="progressbar" aria-label="Overall roadmap progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <span id="overall-progress-bar"></span>
+                    </div>
+                    <div class="progress-card-footer">
+                        <span id="overall-count">0 / 0 topics completed</span>
+                        <span id="remaining-count">0 remaining</span>
+                    </div>
+                </article>
+                <article class="overview-card metric-card">
+                    <span class="metric-label">Topics completed</span>
+                    <strong class="metric-value" id="completed-topics">0</strong>
+                    <span class="metric-caption" id="total-topics-caption">of 0 topics</span>
+                </article>
+                <article class="overview-card metric-card">
+                    <span class="metric-label">Categories completed</span>
+                    <strong class="metric-value" id="completed-categories">0</strong>
+                    <span class="metric-caption" id="total-categories-caption">of 0 categories</span>
+                </article>
+            </section>
+
+            <section class="workspace" aria-label="Roadmap content">
+                <div class="content-heading">
+                    <div>
+                        <div class="eyebrow" id="section-eyebrow">ROADMAP OVERVIEW</div>
+                        <h2 id="section-title">All categories</h2>
+                    </div>
+                    <button class="text-button" id="expand-all-button" type="button">Expand all</button>
+                </div>
+
+                <div class="toolbar">
+                    <label class="search-field">
+                        <span class="sr-only">Search roadmap topics</span>
+                        <span class="search-icon" aria-hidden="true">⌕</span>
+                        <input id="search-input" type="search" placeholder="Search topics or descriptions…" autocomplete="off">
+                        <kbd>/</kbd>
+                    </label>
+                    <label class="select-field">
+                        <span class="sr-only">Filter topics</span>
+                        <select id="filter-select">
+                            <option value="all">All topics</option>
+                            <option value="incomplete">Incomplete</option>
+                            <option value="completed">Completed</option>
+                            <option value="essential">Essential</option>
+                            <option value="important">Important</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div id="results-summary" class="results-summary" aria-live="polite"></div>
+                <div id="roadmap-content" class="roadmap-content"></div>
+                <div id="empty-state" class="empty-state" hidden>
+                    <div class="empty-icon" aria-hidden="true">⌕</div>
+                    <h3>No matching topics</h3>
+                    <p>Try a different search or update your filters.</p>
+                </div>
+            </section>
+
+            <footer class="page-footer">
+                <span>Made for steady progress, not perfection.</span>
+                <span>Progress is stored locally in your browser.</span>
+            </footer>
+        </main>
+    </div>
+</body>
+</html>
